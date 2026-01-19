@@ -6,9 +6,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState, useEffect } from "react"
-import { WalletConnectModal } from "./WalletConnectModal"
-import { SignInModal } from "./SignInModal"
-import { useAppContext } from "@/context/walletContext"
+// import { WalletConnectModal } from "./WalletConnectModal"
+// import { SignInModal } from "./SignInModal"
+// import { useAppContext } from "@/context/walletContext"
 import {
   ChessIcon,
   WatchIcon,
@@ -36,7 +36,7 @@ export function GameSidebar({
   const [collapsed, setLocalCollapsed] = useState(propCollapsed);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
-  const { address, status } = useAppContext();
+  // const { address, status } = useAppContext();
 
   useEffect(() => {
     setCollapsed(collapsed);
@@ -63,8 +63,8 @@ export function GameSidebar({
             <MobileSidebar />
           </SheetContent>
         </Sheet>
-        <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
-        <SignInModal isOpen={isSignInModalOpen} onClose={() => setIsSignInModalOpen(false)} />
+        {/* <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} /> */}
+        {/* <SignInModal isOpen={isSignInModalOpen} onClose={() => setIsSignInModalOpen(false)} /> */}
       </>
     );
   }
@@ -148,11 +148,11 @@ export function GameSidebar({
             collapsed && !isHovered ? "opacity-0" : "opacity-100"
           }`}
         >
-          {status === "connected" && address ? (
+          {status === "connected" ? (
             <div className="flex items-center space-x-3 p-2 rounded-lg bg-gray-800">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
-                  {truncateAddress(address)}
+                  {/* {truncateAddress(address)} */}
                 </p>
               </div>
             </div>
@@ -210,8 +210,8 @@ export function GameSidebar({
           </button>
         </div>
       </div>
-      <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
-      <SignInModal isOpen={isSignInModalOpen} onClose={() => setIsSignInModalOpen(false)} />
+      {/* <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} /> */}
+      {/* <SignInModal isOpen={isSignInModalOpen} onClose={() => setIsSignInModalOpen(false)} /> */}
     </>
   )
 }
