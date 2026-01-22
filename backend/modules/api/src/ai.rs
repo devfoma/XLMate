@@ -39,7 +39,7 @@ pub async fn get_ai_suggestion(payload: Json<AiSuggestionRequest>) -> HttpRespon
                 payload.0.depth,
                 payload.0.time_limit_ms
             ).await;
-            let elapsed = start_time.elapsed().as_millis() as u32;
+            let elapsed = u32::try_from(start_time.elapsed().as_millis()).unwrap_or(u32::MAX);
             
             match result {
                 Ok(result) => {
