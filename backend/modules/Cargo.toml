@@ -12,6 +12,7 @@ members = [
     "chess",
     "challenge",
     "tournament",
+    "matchmaking",
 ]
 
 

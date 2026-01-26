@@ -1,6 +1,7 @@
 pub mod models;
 pub mod routes;
 pub mod service;
+pub mod redis;
 pub mod elo;
 
 pub use models::*;
