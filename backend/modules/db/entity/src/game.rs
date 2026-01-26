@@ -19,7 +19,7 @@ pub enum ResultSide {
     Abandoned,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, DeriveActiveEnum, EnumIter, Serialize, Deserialize)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "game_variant")]
 pub enum GameVariant {
     #[sea_orm(string_value = "standard")]
@@ -28,7 +28,14 @@ pub enum GameVariant {
     Chess960,
     #[sea_orm(string_value = "three_check")]
     ThreeCheck,
+    #[sea_orm(string_value = "blitz")]
+    Blitz,
+    #[sea_orm(string_value = "rapid")]
+    Rapid,
+    #[sea_orm(string_value = "classical")]
+    Classical,
 }
+
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, DeriveEntityModel)]
 
