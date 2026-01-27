@@ -1,4 +1,4 @@
-use entity::player::Model;
+use db_entity::player::Model;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -83,7 +83,6 @@ pub struct UpdatePlayer {
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct DisplayPlayer {
-    #[schema(value_type = String, format = "uuid")]
     pub id: Uuid,
     pub username: String,
     pub email: String,
@@ -95,7 +94,6 @@ pub struct DisplayPlayer {
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct UpdatedPlayer {
-    #[schema(value_type = String, format = "uuid")]
     pub id: Uuid,
     pub username: String,
     pub email: String,

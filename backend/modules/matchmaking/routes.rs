@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::models::*;
-use super::service::{MatchmakingService};
+use super::service::MatchmakingService;
 
 #[derive(Debug, Deserialize)]
 pub struct JoinQueueRequest {
@@ -31,6 +31,12 @@ pub struct CancelRequest {
 pub struct StatusResponse {
     pub status: String,
     pub queue_status: Option<QueueStatus>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ErrorResponse {
+    pub status: String,
+    pub error: String,
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -64,8 +70,16 @@ async fn join_queue(
         max_elo_diff: req.max_elo_diff,
     };
 
-    let response = service.join_queue(match_request);
-    HttpResponse::Ok().json(response)
+    match service.join_queue(match_request).await {
+        Ok(response) => HttpResponse::Ok().json(response),
+        Err(e) => {
+            log::error!("Failed to join queue: {}", e);
+            HttpResponse::ServiceUnavailable().json(ErrorResponse {
+                status: "error".to_string(),
+                error: "Service temporarily unavailable".to_string(),
+            })
+        }
+    }
 }
 
 async fn get_status(
@@ -74,16 +88,22 @@ async fn get_status(
 ) -> impl Responder {
     let request_id = path.into_inner();
 
-    if let Some(status) = service.get_queue_status(request_id) {
-        HttpResponse::Ok().json(StatusResponse {
+    match service.get_queue_status(request_id).await {
+        Ok(Some(status)) => HttpResponse::Ok().json(StatusResponse {
             status: "In queue".to_string(),
             queue_status: Some(status),
-        })
-    } else {
-        HttpResponse::NotFound().json(StatusResponse {
+        }),
+        Ok(None) => HttpResponse::NotFound().json(StatusResponse {
             status: "Request not found".to_string(),
             queue_status: None,
-        })
+        }),
+        Err(e) => {
+            log::error!("Failed to get queue status: {}", e);
+            HttpResponse::ServiceUnavailable().json(ErrorResponse {
+                status: "error".to_string(),
+                error: "Service temporarily unavailable".to_string(),
+            })
+        }
     }
 }
 
@@ -91,16 +111,20 @@ async fn cancel_request(
     service: web::Data<MatchmakingService>,
     req: web::Json<CancelRequest>,
 ) -> impl Responder {
-    let success = service.cancel_request(req.request_id);
-
-    if success {
-        HttpResponse::Ok().json(serde_json::json!({
+    match service.cancel_request(req.request_id).await {
+        Ok(true) => HttpResponse::Ok().json(serde_json::json!({
             "status": "Request cancelled successfully"
-        }))
-    } else {
-        HttpResponse::NotFound().json(serde_json::json!({
+        })),
+        Ok(false) => HttpResponse::NotFound().json(serde_json::json!({
             "status": "Request not found"
-        }))
+        })),
+        Err(e) => {
+            log::error!("Failed to cancel request: {}", e);
+            HttpResponse::ServiceUnavailable().json(ErrorResponse {
+                status: "error".to_string(),
+                error: "Service temporarily unavailable".to_string(),
+            })
+        }
     }
 }
 
@@ -114,11 +138,18 @@ async fn accept_invite(
         join_time: Utc::now(),
     };
 
-    match service.accept_private_invite(req.inviter_request_id, player) {
-        Some(response) => HttpResponse::Ok().json(response),
-        None => HttpResponse::NotFound().json(serde_json::json!({
+    match service.accept_private_invite(req.inviter_request_id, player).await {
+        Ok(Some(response)) => HttpResponse::Ok().json(response),
+        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({
             "status": "Invite not found"
         })),
+        Err(e) => {
+            log::error!("Failed to accept invite: {}", e);
+            HttpResponse::ServiceUnavailable().json(ErrorResponse {
+                status: "error".to_string(),
+                error: "Service temporarily unavailable".to_string(),
+            })
+        }
     }
 }
 
